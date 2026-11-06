@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#f5f7fb">
+<title>QR-код отсканирован</title>
+<style>
+  :root {
+    --bg: #f5f7fb;
+    --card: #ffffff;
+    --ink: #101828;
+    --muted: #667085;
+    --line: #e4e7ec;
+    --accent: #2f5cff;
+    --accent-2: #6a4cff;
+    --ok: #12b76a;
+    --warn: #f79009;
+    --err: #f04438;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { min-height: 100%; }
+  body {
+    margin: 0;
+    padding: 32px 20px calc(32px + env(safe-area-inset-bottom));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+      radial-gradient(900px 500px at 15% -10%, #dfe8ff 0%, transparent 60%),
+      radial-gradient(900px 500px at 110% 110%, #eadfff 0%, transparent 55%),
+      var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .card {
+    width: 100%;
+    max-width: 560px;
+    background: var(--card);
+    border: 1px solid rgba(16, 24, 40, .06);
+    border-radius: 28px;
+    padding: 44px 44px 36px;
+    text-align: center;
+    box-shadow:
+      0 24px 60px -24px rgba(16, 24, 40, .18),
+      0 2px 6px rgba(16, 24, 40, .04);
+  }
+  .icon {
+    width: 76px;
+    height: 76px;
+    margin: 0 auto 24px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    box-shadow: 0 14px 30px -10px rgba(47, 92, 255, .55);
+    animation: pop .45s cubic-bezier(.2, .9, .3, 1.2) both;
+  }
+  .icon svg { width: 38px; height: 38px; display: block; }
+  @keyframes pop {
+    from { transform: scale(.6); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 14px;
+    padding: 7px 14px;
+    border-radius: 999px;
+    background: #eef2ff;
+    color: #3b4fd8;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+  .eyebrow::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--ok);
+    box-shadow: 0 0 0 4px rgba(18, 183, 106, .16);
+  }
+  h1 {
+    margin: 0 0 14px;
+    font-size: clamp(26px, 5vw, 34px);
+    line-height: 1.16;
+    letter-spacing: -.02em;
+  }
+  .subtitle {
+    margin: 0 auto 30px;
+    max-width: 42ch;
+    color: var(--muted);
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    min-height: 56px;
+    padding: 16px 24px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 16px 30px -12px rgba(47, 92, 255, .6);
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .cta:hover { transform: translateY(-1px); box-shadow: 0 20px 34px -12px rgba(47, 92, 255, .7); }
+  .cta:active { transform: translateY(0); }
+  .cta svg { width: 18px; height: 18px; }
+  .footnote {
+    margin: 22px 0 0;
+    color: #98a2b3;
+    font-size: 12.5px;
+    line-height: 1.5;
+  }
+  .consent {
+    position: fixed;
+    left: 20px;
+    right: 20px;
+    bottom: calc(20px + env(safe-area-inset-bottom));
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 16px 18px;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, .96);
+    box-shadow: 0 18px 40px -18px rgba(16, 24, 40, .3);
+    backdrop-filter: blur(8px);
+    color: #475467;
+    font-size: 13px;
+    line-height: 1.5;
+    text-align: left;
+  }
+  .consent p { margin: 0; flex: 1; }
+  .consent-actions { display: flex; gap: 8px; flex-shrink: 0; }
+  .consent button {
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: #fff;
+    color: #344054;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .consent button.primary {
+    border-color: transparent;
+    background: var(--accent);
+    color: #fff;
+  }
+  @media (max-width: 640px) {
+    .consent { flex-direction: column; align-items: stretch; }
+    .consent-actions { justify-content: flex-end; }
+  }
+  .debug {
+    position: fixed;
+    left: 16px;
+    bottom: 16px;
+    z-index: 30;
+    width: min(420px, calc(100vw - 32px));
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: #0f172a;
+    color: #cbd5e1;
+    font: 12px/1.5 ui-monospace, SFMono-Regular, Consolas, monospace;
+    box-shadow: 0 18px 40px -16px rgba(15, 23, 42, .55);
+  }
+  .debug h2 {
+    margin: 0 0 8px;
+    color: #f8fafc;
+    font: 700 12px/1.3 inherit;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+  .debug table { width: 100%; border-collapse: collapse; }
+  .debug td { padding: 3px 0; vertical-align: top; }
+  .debug td:first-child { width: 86px; color: #94a3b8; }
+  .debug .ok { color: #4ade80; }
+  .debug .off { color: #fbbf24; }
+  .debug a { color: #93c5fd; }
+  .debug .url { word-break: break-all; color: #e2e8f0; }
+</style>
+</head>
+<body>
+<main class="card">
+  <div class="icon" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 6 9 17l-5-5"/>
+    </svg>
+  </div>
+  <p class="eyebrow" id="eyebrow">QR-код отсканирован</p>
+  <h1 id="title">Готово! Вы на нужной странице</h1>
+  <p class="subtitle" id="subtitle">Спасибо, что отсканировали код. Нажмите кнопку ниже — продолжим.</p>
+  <a class="cta" id="cta" href="#" rel="noopener">
+    <span id="cta-text">Перейти дальше</span>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M5 12h14M13 6l6 6-6 6"/>
+    </svg>
+  </a>
+  <p class="footnote" id="footnote">Страница открыта по QR-коду.</p>
+</main>
+
+<div class="consent" id="consent" hidden>
+  <p id="consent-text"></p>
+  <div class="consent-actions">
+    <button type="button" id="consent-reject"></button>
+    <button type="button" class="primary" id="consent-accept"></button>
+  </div>
+</div>
+
+<aside class="debug" id="debug" hidden>
+  <h2>Отладка пикселей</h2>
+  <table id="debug-table"></table>
+</aside>
+
+<script>
+/*
+ * Единая настройка проекта.
+ * Это самодостаточный файл для GitHub Pages: рядом не нужны config.js и qr.html.
+ */
+window.QR_PIXEL_CONFIG = {
+  /*
+   * Публичный адрес страницы index.html (куда ведёт QR).
+   * Пример: "https://site.ru/qr/" — обязательно с https и без index.html.
+   */
+  publicUrl: "https://annatarakann-dev.github.io/allobuket/",
+
+  // UTM-метки добавляются к ссылке в QR, если их ещё нет.
+  utm: {
+    enabled: true,
+    source: "qr",
+    medium: "offline",
+    campaign: "retargeting",
+  },
+
+  // Текст на странице, которую видит человек после сканирования.
+  offer: {
+    eyebrow: "QR-код отсканирован",
+    title: "Спасибо, что выбрали нас",
+    subtitle:
+      "Оставьте отзыв на Яндекс Картах — это займёт меньше минуты и очень помогает нам.",
+    buttonText: "Оставить отзыв",
+    buttonUrl: "https://yandex.ru/profile/225365674450?intent=reviews",
+    footnote: "Кнопка откроет профиль организации на Яндекс Картах.",
+  },
+
+  /*
+   * Пиксели ретаргетинга.
+   * Вставьте только числовой ID и включите нужный пиксель (enabled: true).
+   * Пустой ID = код не вставляется вообще, лишних запросов нет.
+   */
+  pixels: {
+    // VK Реклама: Аудитории → Пиксели (top-fwz1.mail.ru)
+    vk: { enabled: true, id: "" },
+
+    // Яндекс Метрика: номер счётчика (mc.yandex.ru)
+    metrika: { enabled: true, id: "114101340" },
+
+    // Meta (Facebook/Instagram): Events Manager. В РФ часто недоступен.
+    meta: { enabled: false, id: "" },
+  },
+
+  /*
+   * Цели, которые отправляются при нажатии кнопки на прокладке.
+   * Создайте такие же цели в кабинетах, иначе события не зачтутся.
+   */
+  events: {
+    vkGoal: "qr_click",
+    metrikaGoal: "qr_click",
+    metaEvent: "Lead",
+  },
+
+  /*
+   * Баннер согласия на cookies. Включите, если требуется по закону:
+   * пиксели запустятся только после нажатия «Принять».
+   */
+  consent: {
+    enabled: false,
+    text: "Мы используем cookies и пиксели ретаргетинга, чтобы показывать вам релевантную рекламу.",
+    acceptText: "Принять",
+    rejectText: "Только необходимые",
+  },
+};
+
+</script>
+<script>
+(function () {
+  "use strict";
+
+  var cfg = window.QR_PIXEL_CONFIG || {};
+  var offer = cfg.offer || {};
+  var pixels = cfg.pixels || {};
+  var events = cfg.events || {};
+  var consentCfg = cfg.consent || {};
+  var CONSENT_KEY = "qr_pixel_consent_v1";
+  var consentState = null;
+  var initialized = { vk: false, metrika: false, meta: false };
+
+  /* ---------- Текст страницы ---------- */
+
+  function text(id, value) {
+    var el = document.getElementById(id);
+    if (el && value) el.textContent = value;
+  }
+
+  text("eyebrow", offer.eyebrow);
+  text("title", offer.title);
+  text("subtitle", offer.subtitle);
+  text("cta-text", offer.buttonText);
+  text("footnote", offer.footnote);
+
+  var cta = document.getElementById("cta");
+  if (offer.buttonUrl) {
+    cta.href = offer.buttonUrl;
+    if (/^https?:\/\//i.test(offer.buttonUrl)) {
+      cta.target = "_blank";
+      cta.rel = "noopener noreferrer";
+    }
+  } else {
+    cta.hidden = true;
+  }
+
+  /* ---------- Пиксели ---------- */
+
+  function cleanId(value) {
+    var id = String(value == null ? "" : value).trim();
+    return /^\d{5,20}$/.test(id) ? id : "";
+  }
+
+  function pixelState(name) {
+    var p = pixels[name] || {};
+    var id = cleanId(p.id);
+    return {
+      name: name,
+      enabled: p.enabled !== false,
+      id: id,
+      ready: p.enabled !== false && !!id,
+    };
+  }
+
+  function initVk(id) {
+    var _tmr = window._tmr || (window._tmr = []);
+    _tmr.push({ id: id, type: "pageView", start: (new Date()).getTime() });
+    if (document.getElementById("tmr-code")) return;
+    var d = document, w = window;
+    var ts = d.createElement("script");
+    ts.id = "tmr-code";
+    ts.type = "text/javascript";
+    ts.async = true;
+    ts.src = "https://top-fwz1.mail.ru/js/code.js";
+    var insert = function () {
+      var first = d.getElementsByTagName("script")[0];
+      if (first && first.parentNode) first.parentNode.insertBefore(ts, first);
+      else d.head.appendChild(ts);
+    };
+    if (w.opera === "[object Opera]") d.addEventListener("DOMContentLoaded", insert, false);
+    else insert();
+    initialized.vk = true;
+  }
+
+  function initMetrika(id) {
+    var counterId = Number(id);
+    var tagUrl = "https://mc.yandex.ru/metrika/tag.js?id=" + encodeURIComponent(id);
+
+    (function (m, e, t, r, i, k, a) {
+      m[i] = m[i] || function () { (m[i].a = m[i].a || []).push(arguments); };
+      m[i].l = 1 * new Date();
+      for (var j = 0; j < e.scripts.length; j++) {
+        if (e.scripts[j].src === r) return;
+      }
+      k = e.createElement(t);
+      a = e.getElementsByTagName(t)[0];
+      k.async = 1;
+      k.src = r;
+      a.parentNode.insertBefore(k, a);
+    })(window, document, "script", tagUrl, "ym");
+
+    window.ym(counterId, "init", {
+      ssr: true,
+      webvisor: true,
+      clickmap: true,
+      ecommerce: "dataLayer",
+      referrer: document.referrer,
+      url: location.href,
+      accurateTrackBounce: true,
+      trackLinks: true,
+    });
+
+    // Резервный <noscript>-пиксель здесь не нужен: при включённом JS он
+    // отправил бы второй хитр, а без JS этот код всё равно не выполнится.
+    initialized.metrika = true;
+  }
+
+  function initMeta(id) {
+    if (!window.fbq) {
+      (function (f, b, e, v, n, t, s) {
+        if (f.fbq) return;
+        n = f.fbq = function () {
+          n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments);
+        };
+        if (!f._fbq) f._fbq = n;
+        n.push = n;
+        n.loaded = true;
+        n.version = "2.0";
+        n.queue = [];
+        t = b.createElement(e);
+        t.async = true;
+        t.src = v;
+        s = b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t, s);
+      })(window, document, "script", "https://connect.facebook.net/en_US/fbevents.js");
+    }
+    window.fbq("init", id);
+    window.fbq("track", "PageView");
+    initialized.meta = true;
+  }
+
+  function initPixels() {
+    var vk = pixelState("vk");
+    var metrika = pixelState("metrika");
+    var meta = pixelState("meta");
+
+    if (vk.ready) initVk(vk.id);
+    if (metrika.ready) initMetrika(metrika.id);
+    if (meta.ready) initMeta(meta.id);
+
+    renderDebug();
+  }
+
+  function fireGoal() {
+    var vk = pixelState("vk");
+    var metrika = pixelState("metrika");
+    var meta = pixelState("meta");
+
+    if (vk.ready && initialized.vk && window._tmr && typeof window._tmr.push === "function") {
+      window._tmr.push({ type: "reachGoal", goal: events.vkGoal || "qr_click" });
+    }
+    if (metrika.ready && initialized.metrika && typeof window.ym === "function") {
+      window.ym(Number(metrika.id), "reachGoal", events.metrikaGoal || "qr_click");
+    }
+    if (meta.ready && initialized.meta && typeof window.fbq === "function") {
+      window.fbq("track", events.metaEvent || "Lead");
+    }
+  }
+
+  cta.addEventListener("click", fireGoal);
+
+  /* ---------- Согласие на cookies ---------- */
+
+  function storedConsent() {
+    try { return localStorage.getItem(CONSENT_KEY); } catch (e) { return null; }
+  }
+
+  function storeConsent(value) {
+    try { localStorage.setItem(CONSENT_KEY, value); } catch (e) { /* приватный режим */ }
+  }
+
+  var consentBox = document.getElementById("consent");
+
+  function hideConsent() {
+    consentBox.hidden = true;
+  }
+
+  function askConsent() {
+    document.getElementById("consent-text").textContent =
+      consentCfg.text || "Мы используем cookies и пиксели ретаргетинга.";
+    document.getElementById("consent-accept").textContent =
+      consentCfg.acceptText || "Принять";
+    document.getElementById("consent-reject").textContent =
+      consentCfg.rejectText || "Только необходимые";
+    consentBox.hidden = false;
+  }
+
+  document.getElementById("consent-accept").addEventListener("click", function () {
+    consentState = "yes";
+    storeConsent("yes");
+    hideConsent();
+    initPixels();
+  });
+
+  document.getElementById("consent-reject").addEventListener("click", function () {
+    consentState = "no";
+    storeConsent("no");
+    hideConsent();
+    renderDebug();
+  });
+
+  /* ---------- Отладочная панель (?debug=1) ---------- */
+
+  function addRow(table, label, value, className) {
+    var tr = document.createElement("tr");
+    var td1 = document.createElement("td");
+    var td2 = document.createElement("td");
+    td1.textContent = label;
+    td2.textContent = value;
+    if (className) td2.className = className;
+    tr.appendChild(td1);
+    tr.appendChild(td2);
+    table.appendChild(tr);
+  }
+
+  function renderDebug() {
+    if (new URLSearchParams(location.search).get("debug") === null) return;
+
+    var box = document.getElementById("debug");
+    var table = document.getElementById("debug-table");
+    box.hidden = false;
+    table.textContent = "";
+
+    ["vk", "metrika", "meta"].forEach(function (name) {
+      var st = pixelState(name);
+      var title = { vk: "VK", metrika: "Метрика", meta: "Meta" }[name];
+      var value;
+      if (!st.enabled) value = "выключен в config.js";
+      else if (!st.id) value = "ID не задан";
+      else if (initialized[name]) value = "код вставлен, ID " + st.id;
+      else if (consentState === "no") value = "отключён: отказ от cookies, ID " + st.id;
+      else value = "ожидает согласия, ID " + st.id;
+      addRow(table, title, value, st.ready && initialized[name] ? "ok" : "off");
+    });
+
+    addRow(table, "Страница", location.href, "url");
+
+    if (location.protocol === "file:") {
+      addRow(table, "Внимание", "открыто локально (file://) — для телефона нужен хостинг", "off");
+    }
+  }
+
+  /* ---------- Запуск ---------- */
+
+  if (consentCfg.enabled) {
+    consentState = storedConsent();
+    if (consentState === "yes") initPixels();
+    else {
+      askConsent();
+      renderDebug();
+    }
+  } else {
+    initPixels();
+  }
+})();
+</script>
+</body>
+</html>
